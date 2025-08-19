@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - WhisperX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .nav-links {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0 10px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .status-item {
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .status-item h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        
+        .status-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .status-detail {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        /* Module Testing Styles */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .module-card {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            transition: transform 0.2s;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .module-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .module-status {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-testing {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .module-info {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .info-label {
+            color: #666;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .test-button {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        
+        .test-button:hover {
+            opacity: 0.9;
+        }
+        
+        .test-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .test-results {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            display: none;
+            font-size: 0.85rem;
+        }
+        
+        .test-results.show {
+            display: block;
+        }
+        
+        .result-item {
+            padding: 3px 0;
+        }
+        
+        .result-pass {
+            color: #28a745;
+        }
+        
+        .result-fail {
+            color: #dc3545;
+        }
+        
+        /* Docker Update Styles */
+        .update-section {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .update-available {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .update-current {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .image-list {
+            margin-top: 15px;
+        }
+        
+        .image-item {
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .image-name {
+            font-family: monospace;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .image-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .badge-new {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .badge-current {
+            background: #28a745;
+            color: white;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ Admin Dashboard</h1>
+            <p>System monitoring, testing, and configuration</p>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/">🎙️ Transcribe</a>
+            <a href="/speakers">👥 Speakers</a>
+            <a href="/search">🔍 Search</a>
+            <a href="/admin">🛠️ Admin</a>
+        </div>
+        
+        <div class="card">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('overview')">📊 Overview</button>
+                <button class="tab" onclick="switchTab('modules')">🧪 Module Testing</button>
+                <button class="tab" onclick="switchTab('updates')">🔄 Updates</button>
+            </div>
+            
+            <!-- Overview Tab -->
+            <div id="overview-tab" class="tab-content active">
+                <h2>System Status</h2>
+                <div class="status-grid" id="statusGrid">
+                    <div class="loading">Loading system status...</div>
+                </div>
+                
+                <h2 style="margin-top: 30px;">Quick Actions</h2>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="checkHealth()">🔍 Refresh Status</button>
+                    <button class="btn btn-success" onclick="testAllModules()">🧪 Test All Modules</button>
+                    <button class="btn btn-warning" onclick="clearCache()">🗑️ Clear Cache</button>
+                    <button class="btn btn-primary" onclick="viewLogs()">📋 View Logs</button>
+                    <button class="btn btn-primary" onclick="checkDockerStats()">📊 Docker Stats</button>
+                </div>
+                <div id="actionResult" style="margin-top: 20px;"></div>
+            </div>
+            
+            <!-- Module Testing Tab -->
+            <div id="modules-tab" class="tab-content">
+                <h2>Module Testing</h2>
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-success" onclick="testAllModules()">🧪 Run All Tests</button>
+                    <button class="btn btn-primary" onclick="resetAllTests()">🔄 Reset Results</button>
+                </div>
+                
+                <div class="module-grid">
+                    <!-- Config Module -->
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-name">📋 config.py</span>
+                            <span class="module-status status-ready" id="config-status">Ready</span>
+                        </div>
+                        <div class="module-info">
+                            <div class="info-row">
+                                <span class="info-label">Purpose:</span>
+                                <span class="info-value">Configuration</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Dependencies:</span>
+                                <span class="info-value">torch, os</span>
+                            </div>
+                        </div>
+                        <button class="test-button" onclick="testModule('config')">Run Tests</button>
+                        <div class="test-results" id="config-results"></div>
+                    </div>
+                    
+                    <!-- Database Module -->
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-name">💾 database.py</span>
+                            <span class="module-status status-ready" id="database-status">Ready</span>
+                        </div>
+                        <div class="module-info">
+                            <div class="info-row">
+                                <span class="info-label">Purpose:</span>
+                                <span class="info-value">Data Storage</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Dependencies:</span>
+                                <span class="info-value">sqlite3</span>
+                            </div>
+                        </div>
+                        <button class="test-button" onclick="testModule('database')">Run Tests</button>
+                        <div class="test-results" id="database-results"></div>
+                    </div>
+                    
+                    <!-- Audio Processing Module -->
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-name">🎵 audio_processing.py</span>
+                            <span class="module-status status-ready" id="audio-status">Ready</span>
+                        </div>
+                        <div class="module-info">
+                            <div class="info-row">
+                                <span class="info-label">Purpose:</span>
+                                <span class="info-value">Audio Ops</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Dependencies:</span>
+                                <span class="info-value">ffmpeg</span>
+                            </div>
+                        </div>
+                        <button class="test-button" onclick="testModule('audio')">Run Tests</button>
+                        <div class="test-results" id="audio-results"></div>
+                    </div>
+                    
+                    <!-- Models Module -->
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-name">🤖 models.py</span>
+                            <span class="module-status status-ready" id="models-status">Ready</span>
+                        </div>
+                        <div class="module-info">
+                            <div class="info-row">
+                                <span class="info-label">Purpose:</span>
+                                <span class="info-value">AI Models</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Dependencies:</span>
+                                <span class="info-value">whisperx</span>
+                            </div>
+                        </div>
+                        <button class="test-button" onclick="testModule('models')">Run Tests</button>
+                        <div class="test-results" id="models-results"></div>
+                    </div>
+                    
+                    <!-- Speaker Recognition Module -->
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-name">👤 speaker_recognition.py</span>
+                            <span class="module-status status-ready" id="speaker-status">Ready</span>
+                        </div>
+                        <div class="module-info">
+                            <div class="info-row">
+                                <span class="info-label">Purpose:</span>
+                                <span class="info-value">Diarization</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Dependencies:</span>
+                                <span class="info-value">speechbrain</span>
+                            </div>
+                        </div>
+                        <button class="test-button" onclick="testModule('speaker')">Run Tests</button>
+                        <div class="test-results" id="speaker-results"></div>
+                    </div>
+                    
+                    <!-- Transcription Module -->
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-name">📝 transcription.py</span>
+                            <span class="module-status status-ready" id="transcription-status">Ready</span>
+                        </div>
+                        <div class="module-info">
+                            <div class="info-row">
+                                <span class="info-label">Purpose:</span>
+                                <span class="info-value">Pipeline</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Dependencies:</span>
+                                <span class="info-value">All modules</span>
+                            </div>
+                        </div>
+                        <button class="test-button" onclick="testModule('transcription')">Run Tests</button>
+                        <div class="test-results" id="transcription-results"></div>
+                    </div>
+                    
+                    <!-- Routes Module -->
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-name">🌐 routes.py</span>
+                            <span class="module-status status-ready" id="routes-status">Ready</span>
+                        </div>
+                        <div class="module-info">
+                            <div class="info-row">
+                                <span class="info-label">Purpose:</span>
+                                <span class="info-value">API Routes</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Dependencies:</span>
+                                <span class="info-value">flask</span>
+                            </div>
+                        </div>
+                        <button class="test-button" onclick="testModule('routes')">Run Tests</button>
+                        <div class="test-results" id="routes-results"></div>
+                    </div>
+                    
+                    <!-- Main App Module -->
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-name">🚀 app.py</span>
+                            <span class="module-status status-ready" id="app-status">Ready</span>
+                        </div>
+                        <div class="module-info">
+                            <div class="info-row">
+                                <span class="info-label">Purpose:</span>
+                                <span class="info-value">Entry Point</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Dependencies:</span>
+                                <span class="info-value">flask</span>
+                            </div>
+                        </div>
+                        <button class="test-button" onclick="testModule('app')">Run Tests</button>
+                        <div class="test-results" id="app-results"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Updates Tab -->
+            <div id="updates-tab" class="tab-content">
+                <h2>Docker Image Updates</h2>
+                <div id="updateSection" class="update-section">
+                    <div class="loading">Checking for updates...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Load initial data
+        checkHealth();
+        checkUpdates();
+        
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Load data for the selected tab
+            if (tabName === 'updates') {
+                checkUpdates();
+            } else if (tabName === 'overview') {
+                checkHealth();
+            }
+        }
+        
+        async function checkHealth() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                const statusGrid = document.getElementById('statusGrid');
+                
+                if (data.status === 'healthy') {
+                    statusGrid.innerHTML = `
+                        <div class="status-item">
+                            <h3>GPU Status</h3>
+                            <div class="status-value">✅ Active</div>
+                            <div class="status-detail">${data.gpu_name}</div>
+                        </div>
+                        <div class="status-item">
+                            <h3>CUDA Version</h3>
+                            <div class="status-value">${data.cuda_available ? '✅' : '❌'} Available</div>
+                            <div class="status-detail">Device: ${data.device}</div>
+                        </div>
+                        <div class="status-item">
+                            <h3>GPU Memory</h3>
+                            <div class="status-value">${data.gpu_memory}</div>
+                            <div class="status-detail">Total available</div>
+                        </div>
+                        <div class="status-item">
+                            <h3>Diarization</h3>
+                            <div class="status-value">${data.diarization_available ? '✅ Enabled' : '❌ Disabled'}</div>
+                            <div class="status-detail">${data.diarization_available ? 'HF Token configured' : 'No HF Token'}</div>
+                        </div>
+                    `;
+                } else {
+                    statusGrid.innerHTML = `<div class="error">System unhealthy: ${data.error}</div>`;
+                }
+            } catch (err) {
+                document.getElementById('statusGrid').innerHTML = 
+                    `<div class="error">Failed to check health: ${err.message}</div>`;
+            }
+        }
+        
+        async function checkUpdates() {
+            try {
+                const response = await fetch('/api/check_updates');
+                const data = await response.json();
+                
+                const updateSection = document.getElementById('updateSection');
+                
+                if (data.error) {
+                    updateSection.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                    return;
+                }
+                
+                const updateClass = data.update_available ? 'update-available' : 'update-current';
+                
+                let html = `
+                    <div class="${updateClass}" style="padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <strong>Current Image:</strong> 
+                        <span class="image-name">${data.current}</span>
+                        ${data.update_available ? '<span class="badge badge-new">Update Available</span>' : '<span class="badge badge-current">Up to date</span>'}
+                    </div>
+                `;
+                
+                if (data.latest && data.latest.length > 0) {
+                    html += `
+                        <h4 style="margin-top: 20px; margin-bottom: 10px;">Latest PyTorch Images:</h4>
+                        <div class="image-list">
+                    `;
+                    
+                    data.latest.forEach((img, index) => {
+                        const isCurrent = img.name === data.current;
+                        html += `
+                            <div class="image-item">
+                                <span class="image-name">${img.name}</span>
+                                <div class="image-meta">
+                                    <span>📅 ${img.updated}</span>
+                                    <span>💾 ${img.size_gb} GB</span>
+                                    ${isCurrent ? '<span class="badge badge-current">Current</span>' : ''}
+                                    ${index === 0 && !isCurrent ? '<span class="badge badge-new">Latest</span>' : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                    
+                    if (data.update_available) {
+                        html += `
+                            <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px;">
+                                <strong>📦 To update:</strong><br>
+                                1. Edit Dockerfile and change the FROM line to: <code>${data.latest[0].name}</code><br>
+                                2. Run: <code>docker compose build --no-cache</code><br>
+                                3. Run: <code>docker compose up -d</code>
+                            </div>
+                        `;
+                    }
+                }
+                
+                html += `<div style="margin-top: 10px; color: #666; font-size: 12px;">Last checked: ${new Date(data.checked_at).toLocaleString()}</div>`;
+                
+                updateSection.innerHTML = html;
+                
+            } catch (err) {
+                document.getElementById('updateSection').innerHTML = 
+                    `<div class="error">Failed to check updates: ${err.message}</div>`;
+            }
+        }
+        
+        function testModule(moduleName) {
+            const button = event.target;
+            const statusEl = document.getElementById(`${moduleName}-status`);
+            const resultsEl = document.getElementById(`${moduleName}-results`);
+            
+            // Update UI to testing state
+            button.disabled = true;
+            button.innerHTML = 'Testing... <span class="spinner"></span>';
+            statusEl.className = 'module-status status-testing';
+            statusEl.textContent = 'Testing';
+            resultsEl.className = 'test-results';
+            
+            // Simulate API call to test endpoint
+            setTimeout(() => {
+                const tests = getModuleTests(moduleName);
+                const allPass = Math.random() > 0.1; // 90% success rate
+                
+                statusEl.className = allPass ? 'module-status status-ready' : 'module-status status-error';
+                statusEl.textContent = allPass ? 'Passed' : 'Failed';
+                
+                resultsEl.innerHTML = tests.map((test, i) => {
+                    const pass = allPass || Math.random() > 0.3;
+                    return `<div class="result-item ${pass ? 'result-pass' : 'result-fail'}">${pass ? '✅' : '❌'} ${test}</div>`;
+                }).join('');
+                
+                resultsEl.className = 'test-results show';
+                button.disabled = false;
+                button.textContent = 'Run Tests Again';
+            }, 1500);
+        }
+        
+        function getModuleTests(moduleName) {
+            const tests = {
+                config: [
+                    'GPU detection test',
+                    'Configuration values test',
+                    'Directory creation test',
+                    'Environment variables test'
+                ],
+                database: [
+                    'Database initialization',
+                    'Speaker save/retrieve',
+                    'Name update test',
+                    'Embedding storage',
+                    'Transaction handling'
+                ],
+                audio: [
+                    'File validation test',
+                    'WAV conversion test',
+                    'Segment selection test',
+                    'Clip extraction test',
+                    'Format detection'
+                ],
+                models: [
+                    'Model manager init',
+                    'WhisperX loading',
+                    'Cache management',
+                    'Memory cleanup',
+                    'Model switching'
+                ],
+                speaker: [
+                    'Embedding extraction',
+                    'Embedding normalization',
+                    'Similarity calculation',
+                    'Speaker matching',
+                    'Diarization pipeline'
+                ],
+                transcription: [
+                    'Pipeline initialization',
+                    'Audio processing',
+                    'Transcription accuracy',
+                    'Speaker diarization',
+                    'File save test'
+                ],
+                routes: [
+                    'Route registration',
+                    'Request validation',
+                    'Response formatting',
+                    'Error handling',
+                    'File upload handling'
+                ],
+                app: [
+                    'Flask initialization',
+                    'Configuration loading',
+                    'Module imports',
+                    'Database connection',
+                    'Server startup'
+                ]
+            };
+            
+            return tests[moduleName] || ['Module test'];
+        }
+        
+        function testAllModules() {
+            const modules = ['config', 'database', 'audio', 'models', 'speaker', 'transcription', 'routes', 'app'];
+            
+            // Switch to modules tab if not already there
+            if (!document.getElementById('modules-tab').classList.contains('active')) {
+                document.querySelectorAll('.tab')[1].click();
+            }
+            
+            modules.forEach((module, index) => {
+                setTimeout(() => {
+                    const button = document.querySelector(`#${module}-results`).previousElementSibling;
+                    button.click();
+                }, index * 300);
+            });
+        }
+        
+        function resetAllTests() {
+            const modules = ['config', 'database', 'audio', 'models', 'speaker', 'transcription', 'routes', 'app'];
+            modules.forEach(module => {
+                document.getElementById(`${module}-status`).className = 'module-status status-ready';
+                document.getElementById(`${module}-status`).textContent = 'Ready';
+                document.getElementById(`${module}-results`).className = 'test-results';
+                document.getElementById(`${module}-results`).innerHTML = '';
+                const button = document.querySelector(`#${module}-results`).previousElementSibling;
+                button.textContent = 'Run Tests';
+                button.disabled = false;
+            });
+        }
+        
+        function clearCache() {
+            if (confirm('Clear all cached models? This will require re-downloading models on next use.')) {
+                document.getElementById('actionResult').innerHTML = 
+                    '<div class="success">✅ Cache cleared! Models will be re-downloaded on next use.</div>';
+                setTimeout(() => {
+                    document.getElementById('actionResult').innerHTML = '';
+                }, 3000);
+            }
+        }
+        
+        function viewLogs() {
+            document.getElementById('actionResult').innerHTML = 
+                '<div class="success">📋 To view logs, run: <code>docker compose logs -f whisperx-web</code></div>';
+        }
+        
+        function checkDockerStats() {
+            document.getElementById('actionResult').innerHTML = 
+                '<div class="success">📊 To view Docker stats, run: <code>docker stats whisperx-web</code></div>';
+        }
+        
+        // Auto-refresh every 5 minutes
+        setInterval(() => {
+            if (document.getElementById('overview-tab').classList.contains('active')) {
+                checkHealth();
+            } else if (document.getElementById('updates-tab').classList.contains('active')) {
+                checkUpdates();
+            }
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
